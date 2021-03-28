@@ -1,12 +1,15 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Form, Button } from 'react-bootstrap';
 
 const SecondStep = (props) => {
+  const history = useHistory();
   const { register, handleSubmit, errors } = useForm();
 
   const onSubmit = (data) => {
     console.log(data);
+    history.push('/third');
   };
 
   return (
