@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
 import csc from 'country-state-city';
 import axios from 'axios';
 import { BASE_API_URL } from '../utils/constants';
 import { motion } from 'framer-motion';
+import Swal from 'sweetalert2';
 
-const ThirdStep = () => {
+
+const ThirdStep = (props) => {
+  const history = useHistory();
 
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
@@ -89,6 +93,40 @@ const ThirdStep = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    try {
+      const { user } = props;
+      const updatedData = {
+        country: countries.find(
+          (country) => country.isoCode === selectedCountry
+        )?.name,
+        state:
+          states.find((state) => state.isoCode === selectedState)?.name || '',
+        city: selectedCity
+      };
+
+      await axios.post(`${BASE_API_URL}/register`, {
+        ...user,
+        ...updatedData
+      });
+
+      Swal.fire('Awesome!', "You're successfully registered!", 'success').then(
+        (result) => {
+          if (result.isConfirmed || result.isDismissed) {
+            history.push('/');
+          }
+        }
+      );
+
+    } catch(error) {
+      if(error.response) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: error.response.data
+        });
+      }
+    }
   }
 
   return (
